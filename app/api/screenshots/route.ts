@@ -1,14 +1,29 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
-  const response = await fetch(
-    `https://api.rawg.io/api/games/${params.id}/screenshots?key=${process.env.RAWG_API_KEY}`
-  );
+export async function GET(req: NextRequest) {
+  try {
+    const url = new URL(req.url);
+    const gameId = url.searchParams.get("id");
 
-  const data = await response.json();
+    if (!gameId) {
+      return NextResponse.json(
+        { error: "Missing game id" },
+        { status: 400 }
+      );
+    }
 
-  return NextResponse.json(data);
+    const response = await fetch(
+      `https://api.rawg.io/api/games/${gameId}/screenshots?key=${process.env.RAWG_API_KEY}`,
+      { cache: "no-store" }
+    );
+
+    const data = await response.json();
+
+    return NextResponse.json(data);
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Failed to fetch screenshots" },
+      { status: 500 }
+    );
+  }
 }
