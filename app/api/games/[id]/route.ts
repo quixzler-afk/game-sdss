@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   try {
-    const { id } = params;
+    const { id } = context.params;
 
     const apiKey = process.env.RAWG_API_KEY;
 
@@ -18,19 +18,13 @@ export async function GET(
 
     const response = await fetch(
       `https://api.rawg.io/api/games/${id}?key=${apiKey}`,
-      {
-        cache: "no-store",
-      }
+      { cache: "no-store" }
     );
 
     if (!response.ok) {
       return NextResponse.json(
-        {
-          error: "Failed to fetch game detail",
-        },
-        {
-          status: response.status,
-        }
+        { error: "Failed to fetch game detail" },
+        { status: response.status }
       );
     }
 
@@ -41,9 +35,7 @@ export async function GET(
     console.error("Game detail error:", error);
 
     return NextResponse.json(
-      {
-        error: "Internal server error",
-      },
+      { error: "Internal server error" },
       { status: 500 }
     );
   }
