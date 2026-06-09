@@ -1,7 +1,7 @@
 import axios from "axios";
 
 /**
- * Get list games (Explore page)
+ * Explore Games
  */
 export async function getGames(
   page = 1,
@@ -9,30 +9,51 @@ export async function getGames(
   platform = "",
   search = ""
 ) {
-  const { data } = await axios.get(
-    "/api/games",
-    {
-      params: {
-        page,
-        genre,
-        platform,
-        search,
-      },
-    }
-  );
+  const { data } = await axios.get("/api/games", {
+    params: {
+      page,
+      genre,
+      platform,
+      search,
+    },
+  });
 
   return data.results ?? [];
 }
 
 /**
- * Get single game detail
+ * Detail Game
  */
-export async function getGameById(id: string) {
-  const res = await fetch(
-    `https://api.rawg.io/api/games/${id}?key=${process.env.NEXT_PUBLIC_RAWG_API_KEY}`
+export async function getGameById(
+  id: string
+) {
+  const response = await fetch(
+    `/api/games/${id}`
   );
 
-  if (!res.ok) throw new Error("Game not found");
+  if (!response.ok) {
+    throw new Error(
+      "Failed to fetch game"
+    );
+  }
 
-  return res.json();
+  return response.json();
+}
+
+/**
+ * CheapShark Deals
+ */
+export async function getGameDeals(
+  title: string
+) {
+  const { data } = await axios.get(
+    `/api/games/deals`,
+    {
+      params: {
+        title,
+      },
+    }
+  );
+
+  return data;
 }

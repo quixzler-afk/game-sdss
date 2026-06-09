@@ -3,13 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 
-import {
-  Calendar,
-  Heart,
-  Monitor,
-  Star,
-  Trophy,
-} from "lucide-react";
+import { Calendar, Heart, Monitor, Star, Trophy } from "lucide-react";
 
 import DashboardLayout from "components/DashboardLayout";
 import { supabase } from "lib/supabase";
@@ -39,17 +33,13 @@ interface GameDetail {
 export default function GameDetailPage() {
   const params = useParams();
 
-  const [game, setGame] =
-    useState<GameDetail | null>(null);
+  const [game, setGame] = useState<GameDetail | null>(null);
 
-  const [screenshots, setScreenshots] =
-    useState<any[]>([]);
+  const [screenshots, setScreenshots] = useState<any[]>([]);
 
-  const [loading, setLoading] =
-    useState(true);
+  const [loading, setLoading] = useState(true);
 
-  const [saving, setSaving] =
-    useState(false);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (params?.id) {
@@ -60,12 +50,9 @@ export default function GameDetailPage() {
 
   const fetchGame = async () => {
     try {
-      const response = await fetch(
-        `/api/games/${params.id}`
-      );
+      const response = await fetch(`/api/games/${params.id}`);
 
-      const data =
-        await response.json();
+      const data = await response.json();
 
       setGame(data);
     } catch (error) {
@@ -75,85 +62,63 @@ export default function GameDetailPage() {
     }
   };
 
-  const fetchScreenshots =
-    async () => {
-      try {
-        const response = await fetch(
-          `/api/games/${params.id}/screenshots`
-        );
+  const fetchScreenshots = async () => {
+    try {
+      const response = await fetch(`/api/screenshots?id=${params.id}`);
 
-        const data =
-          await response.json();
+      if (!response.ok) return;
 
-        setScreenshots(
-          data.results || []
-        );
-      } catch (error) {
-        console.error(error);
+      const data = await response.json();
+
+      setScreenshots(data.results || []);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const addToWishlist = async () => {
+    if (!game) return;
+
+    try {
+      setSaving(true);
+
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) {
+        alert("Silakan login terlebih dahulu");
+        return;
       }
-    };
 
-  const addToWishlist =
-    async () => {
-      if (!game) return;
+      const { error } = await supabase.from("wishlist").insert({
+        user_id: user.id,
+        game_id: game.id,
+        game_name: game.name,
+        image_url: game.background_image,
+      });
 
-      try {
-        setSaving(true);
-
-        const {
-          data: { user },
-        } =
-          await supabase.auth.getUser();
-
-        if (!user) {
-          alert(
-            "Silakan login terlebih dahulu"
-          );
+      if (error) {
+        if (error.message.includes("wishlist_user_game_unique")) {
+          alert("Game sudah ada di wishlist");
           return;
         }
 
-        const { error } =
-          await supabase
-            .from("wishlist")
-            .insert({
-              user_id: user.id,
-              game_id: game.id,
-              game_name: game.name,
-              image_url:
-                game.background_image,
-            });
-
-        if (error) {
-          if (
-            error.message.includes(
-              "wishlist_user_game_unique"
-            )
-          ) {
-            alert(
-              "Game sudah ada di wishlist"
-            );
-            return;
-          }
-
-          throw error;
-        }
-
-        alert(
-          "Game berhasil ditambahkan ke wishlist"
-        );
-      } catch (error: any) {
-        alert(error.message);
-      } finally {
-        setSaving(false);
+        throw error;
       }
-    };
+
+      alert("Game berhasil ditambahkan ke wishlist");
+    } catch (error: any) {
+      alert(error.message);
+    } finally {
+      setSaving(false);
+    }
+  };
 
   if (loading) {
     return (
       <DashboardLayout>
-        <div className="p-8 text-white">
-          Loading...
-        </div>
+        <div className="p-8 text-white">Loading...</div>
       </DashboardLayout>
     );
   }
@@ -161,9 +126,7 @@ export default function GameDetailPage() {
   if (!game) {
     return (
       <DashboardLayout>
-        <div className="p-8 text-white">
-          Game tidak ditemukan.
-        </div>
+        <div className="p-8 text-white">Game tidak ditemukan.</div>
       </DashboardLayout>
     );
   }
@@ -171,7 +134,6 @@ export default function GameDetailPage() {
   return (
     <DashboardLayout>
       <div className="text-white">
-
         {/* HERO */}
         <div className="relative h-[450px]">
           <img
@@ -213,11 +175,10 @@ export default function GameDetailPage() {
             </h1>
 
             <div className="flex flex-wrap gap-2">
-              {game.genres.map(
-                (genre) => (
-                  <span
-                    key={genre.id}
-                    className="
+              {game.genres.map((genre) => (
+                <span
+                  key={genre.id}
+                  className="
                       px-3
                       py-1
                       rounded-full
@@ -225,18 +186,16 @@ export default function GameDetailPage() {
                       text-cyan-400
                       text-sm
                     "
-                  >
-                    {genre.name}
-                  </span>
-                )
-              )}
+                >
+                  {genre.name}
+                </span>
+              ))}
             </div>
           </div>
         </div>
 
         {/* CONTENT */}
         <div className="p-8">
-
           {/* STATS */}
           <div
             className="
@@ -253,18 +212,11 @@ export default function GameDetailPage() {
                 p-5
               "
             >
-              <Star
-                className="mb-2"
-                size={22}
-              />
+              <Star className="mb-2" size={22} />
 
-              <p className="text-slate-400">
-                Rating
-              </p>
+              <p className="text-slate-400">Rating</p>
 
-              <h2 className="text-2xl font-bold">
-                {game.rating}
-              </h2>
+              <h2 className="text-2xl font-bold">{game.rating}</h2>
             </div>
 
             <div
@@ -274,19 +226,11 @@ export default function GameDetailPage() {
                 p-5
               "
             >
-              <Trophy
-                className="mb-2"
-                size={22}
-              />
+              <Trophy className="mb-2" size={22} />
 
-              <p className="text-slate-400">
-                Metacritic
-              </p>
+              <p className="text-slate-400">Metacritic</p>
 
-              <h2 className="text-2xl font-bold">
-                {game.metacritic ??
-                  "N/A"}
-              </h2>
+              <h2 className="text-2xl font-bold">{game.metacritic ?? "N/A"}</h2>
             </div>
 
             <div
@@ -296,18 +240,11 @@ export default function GameDetailPage() {
                 p-5
               "
             >
-              <Calendar
-                className="mb-2"
-                size={22}
-              />
+              <Calendar className="mb-2" size={22} />
 
-              <p className="text-slate-400">
-                Release Date
-              </p>
+              <p className="text-slate-400">Release Date</p>
 
-              <h2 className="font-semibold">
-                {game.released}
-              </h2>
+              <h2 className="font-semibold">{game.released}</h2>
             </div>
 
             <div
@@ -317,37 +254,25 @@ export default function GameDetailPage() {
                 p-5
               "
             >
-              <Monitor
-                className="mb-2"
-                size={22}
-              />
+              <Monitor className="mb-2" size={22} />
 
-              <p className="text-slate-400">
-                Platforms
-              </p>
+              <p className="text-slate-400">Platforms</p>
 
               <div className="flex flex-wrap gap-2 mt-2">
-                {game.parent_platforms?.map(
-                  (item) => (
-                    <span
-                      key={
-                        item.platform.id
-                      }
-                      className="
+                {game.parent_platforms?.map((item) => (
+                  <span
+                    key={item.platform.id}
+                    className="
                         bg-slate-700
                         px-2
                         py-1
                         rounded
                         text-xs
                       "
-                    >
-                      {
-                        item.platform
-                          .name
-                      }
-                    </span>
-                  )
-                )}
+                  >
+                    {item.platform.name}
+                  </span>
+                ))}
               </div>
             </div>
           </div>
@@ -372,9 +297,7 @@ export default function GameDetailPage() {
             >
               <Heart size={18} />
 
-              {saving
-                ? "Saving..."
-                : "Add to Wishlist"}
+              {saving ? "Saving..." : "Add to Wishlist"}
             </button>
           </div>
 
@@ -426,19 +349,17 @@ export default function GameDetailPage() {
                 gap-5
               "
             >
-              {screenshots.map(
-                (shot) => (
-                  <img
-                    key={shot.id}
-                    src={shot.image}
-                    alt="screenshot"
-                    className="
+              {screenshots.map((shot) => (
+                <img
+                  key={shot.id}
+                  src={shot.image}
+                  alt="screenshot"
+                  className="
                       rounded-xl
                       w-full
                     "
-                  />
-                )
-              )}
+                />
+              ))}
             </div>
           </div>
         </div>

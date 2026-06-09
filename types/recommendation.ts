@@ -1,3 +1,5 @@
+import { GameAlternative } from "./game";
+
 export interface AHPWeights {
   price: number;
   metacritic: number;
@@ -7,27 +9,12 @@ export interface AHPWeights {
   releaseDate: number;
 }
 
-export interface GameAlternative {
-  id: number;
-
-  name: string;
-
-  image: string;
-
-  genre?: string;
-
-  platform?: string;
-
+export interface CriterionBreakdown {
   price: number;
-
   metacritic: number;
-
   popularity: number;
-
   rating: number;
-
   reviewCount: number;
-
   releaseDate: number;
 }
 
@@ -36,6 +23,8 @@ export interface RankedGame
   topsisScore: number;
 
   rank: number;
+
+  breakdown: CriterionBreakdown;
 }
 
 export interface RecommendationHistoryPayload {
@@ -52,18 +41,4 @@ export interface RecommendationHistoryPayload {
   recommendation_result: RankedGame[];
 }
 
-export interface CriterionBreakdown {
-  price: number;
-  metacritic: number;
-  popularity: number;
-  rating: number;
-  reviewCount: number;
-  releaseDate: number;
-}
-
-export interface RankedGame extends GameAlternative {
-  topsisScore: number;
-  rank: number;
-
-  breakdown: CriterionBreakdown;
-}
+export type { GameAlternative };

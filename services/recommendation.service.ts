@@ -3,8 +3,11 @@ import { supabase } from "../lib/supabase";
 import {
   RecommendationHistoryPayload,
   AHPWeights,
-  GameAlternative,
 } from "../types/recommendation";
+
+import {
+  GameAlternative,
+} from "../types/game";
 
 import { calculateTOPSIS } from "../lib/topsis";
 
@@ -17,10 +20,7 @@ const RAWG_API_KEY = process.env.NEXT_PUBLIC_RAWG_API_KEY;
  * SIMPLE CACHE (IN MEMORY)
  * =========================
  */
-const cache = new Map<
-  string,
-  { data: GameAlternative[]; timestamp: number }
->();
+const cache = new Map<string, { data: GameAlternative[]; timestamp: number }>();
 
 const CACHE_TTL = 1000 * 60 * 10; // 10 menit
 
@@ -35,7 +35,7 @@ function getCacheKey(genre?: string, platform?: string) {
  */
 export async function getRecommendationGames(
   genre?: string,
-  platform?: string
+  platform?: string,
 ): Promise<GameAlternative[]> {
   const cacheKey = getCacheKey(genre, platform);
 
@@ -59,30 +59,32 @@ export async function getRecommendationGames(
   const response = await fetch(url);
   const data = await response.json();
 
-  const games: GameAlternative[] = (data.results ?? []).map(
-    (game: any) => ({
-      id: game.id,
-      name: game.name,
-      image: game.background_image,
-      genre: game.genres?.[0]?.name ?? "",
-      platform:
-        game.parent_platforms
-          ?.map((p: any) => p.platform.name)
-          .join(", ") ?? "",
+  const games: GameAlternative[] = (data.results ?? []).map((game: any) => ({
+    id: game.id,
 
-      // sementara random price
-      price: Math.floor(Math.random() * 900000) + 100000,
+    name: game.name,
 
-      metacritic: game.metacritic ?? 0,
-      popularity: game.added ?? 0,
-      rating: game.rating ?? 0,
-      reviewCount: game.ratings_count ?? 0,
+    image: game.background_image ?? "/placeholder-game.jpg",
 
-      releaseDate: game.released
-        ? new Date(game.released).getTime()
-        : 0,
-    })
-  );
+    genre: game.genres?.map((g: any) => g.name).join(", ") ?? "Unknown",
+
+    platform:
+      game.parent_platforms?.map((p: any) => p.platform.name).join(", ") ??
+      "Unknown",
+
+    // sementara random price
+    price: Math.floor(Math.random() * 900000) + 100000,
+
+    metacritic: game.metacritic ?? 0,
+
+    popularity: game.added ?? 0,
+
+    rating: game.rating ?? 0,
+
+    reviewCount: game.ratings_count ?? 0,
+
+    releaseDate: game.released ? new Date(game.released).getTime() : 0,
+  }));
 
   // ✔ simpan ke cache
   cache.set(cacheKey, {
@@ -100,13 +102,9 @@ export async function getRecommendationGames(
  */
 export function generateRecommendation(
   games: GameAlternative[],
-  weights: AHPWeights
+  weights: AHPWeights,
 ) {
-  return calculateTOPSIS(
-    games,
-    TOPSIS_CRITERIA as any,
-    weights
-  );
+  return calculateTOPSIS(games, TOPSIS_CRITERIA as any, weights);
 }
 
 /**
@@ -115,11 +113,9 @@ export function generateRecommendation(
  * =========================
  */
 export async function saveRecommendationHistory(
-  payload: RecommendationHistoryPayload
+  payload: RecommendationHistoryPayload,
 ) {
-  return supabase
-    .from("recommendation_history")
-    .insert(payload);
+  return supabase.from("recommendation_history").insert(payload);
 }
 
 export async function getRecommendationHistory(userId: string) {
@@ -131,8 +127,5 @@ export async function getRecommendationHistory(userId: string) {
 }
 
 export async function deleteRecommendationHistory(id: string) {
-  return supabase
-    .from("recommendation_history")
-    .delete()
-    .eq("id", id);
+  return supabase.from("recommendation_history").delete().eq("id", id);
 }

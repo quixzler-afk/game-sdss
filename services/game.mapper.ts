@@ -1,34 +1,79 @@
 import { GameAlternative } from "../types/game";
 import { usdToIdr } from "../lib/currency";
 
+type CheapSharkDeal = {
+  salePrice?: string;
+};
+
+type CheapSharkMap = Record<
+  number,
+  CheapSharkDeal | undefined
+>;
+
 export function mapRawgGames(
   games: any[],
-  cheapSharkMap: Record<number, any> = {}
+  cheapSharkMap: CheapSharkMap = {}
 ): GameAlternative[] {
   return games.map((game) => {
-    const cheapShark = cheapSharkMap[game.id];
+    const cheapShark =
+      cheapSharkMap[game.id];
+
+    const genre =
+      game.genres?.length > 0
+        ? game.genres
+            .map((g: any) => g.name)
+            .join(", ")
+        : "-";
+
+    const platform =
+      game.parent_platforms?.length > 0
+        ? game.parent_platforms
+            .map(
+              (p: any) =>
+                p.platform?.name
+            )
+            .filter(Boolean)
+            .join(", ")
+        : "-";
 
     return {
-      id: game.id,
-      name: game.name,
-      image: game.background_image,
+      id: Number(game.id),
 
-      genre: game.genres?.[0]?.name ?? "-",
-      platform:
-        game.parent_platforms?.[0]?.platform?.name ?? "-",
+      name: game.name ?? "Unknown Game",
 
-      price: cheapShark
-        ? usdToIdr(Number(cheapShark.salePrice))
+      image:
+        game.background_image ??
+        "/placeholder-game.jpg",
+
+      genre,
+
+      platform,
+
+      price: cheapShark?.salePrice
+        ? usdToIdr(
+            Number(
+              cheapShark.salePrice
+            )
+          )
         : 0,
 
-      metacritic: game.metacritic ?? 0,
-      popularity: game.added ?? 0,
-      rating: game.rating ?? 0,
-      reviewCount: game.ratings_count ?? 0,
+      metacritic:
+        game.metacritic ?? 0,
 
-      releaseDate: new Date(
-        game.released ?? "2000-01-01"
-      ).getTime(),
+      popularity:
+        game.added ?? 0,
+
+      rating:
+        Number(game.rating) ?? 0,
+
+      reviewCount:
+        game.ratings_count ?? 0,
+
+      releaseDate: game.released
+        ? new Date(
+            game.released
+          ).getTime()
+        : 0,
     };
   });
 }

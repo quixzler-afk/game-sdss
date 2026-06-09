@@ -2,16 +2,9 @@
 
 import { ReactNode, useState } from "react";
 import Link from "next/link";
-import {
-  usePathname,
-  useRouter,
-} from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
-import {
-  ChevronLeft,
-  ChevronRight,
-  LogOut,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight, LogOut } from "lucide-react";
 
 import { sidebarMenu } from "../constants/sidebar-menu";
 import { logout } from "../services/auth.service";
@@ -20,39 +13,27 @@ interface DashboardLayoutProps {
   children: ReactNode;
 }
 
-export default function DashboardLayout({
-  children,
-}: DashboardLayoutProps) {
+export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const pathname = usePathname();
   const router = useRouter();
 
-  const [collapsed, setCollapsed] =
-    useState(true);
+  const [collapsed, setCollapsed] = useState(true);
 
-  const handleLogout =
-    async () => {
-      try {
-        await logout();
-        router.push("/login");
-      } catch (error) {
-        console.error(
-          "Logout error:",
-          error
-        );
-      }
-    };
+  const handleLogout = async () => {
+    try {
+      await logout();
+      router.push("/login");
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
 
   return (
     <div className="min-h-screen flex bg-[#0B1020] text-white">
-
       {/* SIDEBAR */}
       <aside
         className={`
-          ${
-            collapsed
-              ? "w-16"
-              : "w-64"
-          }
+          ${collapsed ? "w-16" : "w-64"}
 
           sticky
           top-0
@@ -83,56 +64,60 @@ export default function DashboardLayout({
           "
         >
           {!collapsed && (
-            <h1 className="font-bold text-lg">
-              Game SDSS
-            </h1>
+            <div className="flex items-center gap-3">
+              {/* LOGO */}
+              <div
+                className="
+                  w-9
+                  h-9
+                  rounded-xl
+
+                  bg-cyan-400
+                  text-black
+
+                  flex
+                  items-center
+                  justify-center
+
+                  font-bold
+                  text-lg
+                "
+              >
+                G
+              </div>
+
+              <div>
+                <h1 className="font-bold text-lg text-white">GameFinder</h1>
+
+                <p className="text-[10px] text-slate-400">AHP + TOPSIS DSS</p>
+              </div>
+            </div>
           )}
 
           <button
-            onClick={() =>
-              setCollapsed(
-                !collapsed
-              )
-            }
+            onClick={() => setCollapsed(!collapsed)}
             className="
               p-1
               rounded
               hover:bg-[#16213E]
             "
           >
-            {collapsed ? (
-              <ChevronRight
-                size={20}
-              />
-            ) : (
-              <ChevronLeft
-                size={20}
-              />
-            )}
+            {collapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
           </button>
         </div>
 
         {/* MENU + LOGOUT */}
         <div className="p-2">
+          {sidebarMenu.map((item) => {
+            const Icon = item.icon;
 
-          {sidebarMenu.map(
-            (item) => {
-              const Icon =
-                item.icon;
+            const active = pathname === item.href;
 
-              const active =
-                pathname ===
-                item.href;
-
-              return (
-                <Link
-                  key={
-                    item.href
-                  }
-                  href={
-                    item.href
-                  }
-                  className={`
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`
                     flex
                     items-center
                     gap-3
@@ -143,34 +128,19 @@ export default function DashboardLayout({
                     rounded-xl
                     transition
 
-                    ${
-                      active
-                        ? "bg-cyan-400 text-black"
-                        : "hover:bg-[#16213E]"
-                    }
+                    ${active ? "bg-cyan-400 text-black" : "hover:bg-[#16213E]"}
                   `}
-                >
-                  <Icon
-                    size={20}
-                  />
+              >
+                <Icon size={20} />
 
-                  {!collapsed && (
-                    <span>
-                      {
-                        item.label
-                      }
-                    </span>
-                  )}
-                </Link>
-              );
-            }
-          )}
+                {!collapsed && <span>{item.label}</span>}
+              </Link>
+            );
+          })}
 
           {/* LOGOUT */}
           <button
-            onClick={
-              handleLogout
-            }
+            onClick={handleLogout}
             className="
               w-full
 
@@ -189,15 +159,9 @@ export default function DashboardLayout({
               transition
             "
           >
-            <LogOut
-              size={20}
-            />
+            <LogOut size={20} />
 
-            {!collapsed && (
-              <span>
-                Logout
-              </span>
-            )}
+            {!collapsed && <span>Logout</span>}
           </button>
         </div>
       </aside>

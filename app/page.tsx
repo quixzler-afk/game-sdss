@@ -8,6 +8,10 @@ import {
   Gamepad2,
   Trophy,
   BarChart3,
+  Database,
+  CircleHelp,
+  Star,
+  Sparkles,
 } from "lucide-react";
 
 import { supabase } from "lib/supabase";
@@ -33,27 +37,62 @@ export default function HomePage() {
   return (
     <main className="min-h-screen bg-[#0B1020] text-white">
 
+      {/* ========================= */}
       {/* NAVBAR */}
+      {/* ========================= */}
       <nav
         className="
+          sticky
+          top-0
+          z-50
+
           h-20
+
+          backdrop-blur-md
+          bg-[#0B1020]/90
+
           border-b
           border-slate-800
+
           flex
           items-center
           justify-between
-          px-8
+
+          px-6
+          md:px-10
         "
       >
         <div className="flex items-center gap-3">
-          <Gamepad2
-            size={28}
-            className="text-cyan-400"
-          />
 
-          <h1 className="font-bold text-xl">
-            Game Recommendation System
-          </h1>
+          <div
+            className="
+              w-10
+              h-10
+
+              rounded-xl
+
+              bg-cyan-400
+              text-black
+
+              flex
+              items-center
+              justify-center
+
+              font-bold
+            "
+          >
+            G
+          </div>
+
+          <div>
+            <h1 className="font-bold text-xl">
+              GameFinder
+            </h1>
+
+            <p className="text-xs text-slate-400">
+              AHP + TOPSIS DSS
+            </p>
+          </div>
         </div>
 
         <div className="flex gap-3">
@@ -65,9 +104,12 @@ export default function HomePage() {
               className="
                 bg-cyan-400
                 text-black
+
                 px-5
                 py-2
-                rounded-lg
+
+                rounded-xl
+
                 font-semibold
               "
             >
@@ -82,9 +124,11 @@ export default function HomePage() {
                 className="
                   border
                   border-slate-700
+
                   px-5
                   py-2
-                  rounded-lg
+
+                  rounded-xl
                 "
               >
                 Login
@@ -97,9 +141,12 @@ export default function HomePage() {
                 className="
                   bg-cyan-400
                   text-black
+
                   px-5
                   py-2
-                  rounded-lg
+
+                  rounded-xl
+
                   font-semibold
                 "
               >
@@ -110,45 +157,38 @@ export default function HomePage() {
         </div>
       </nav>
 
+      {/* ========================= */}
       {/* HERO */}
+      {/* ========================= */}
       <section
         className="
           max-w-7xl
           mx-auto
-          px-8
+
+          px-6
+          md:px-10
+
           py-24
           text-center
         "
       >
-        <div
-          className="
-            inline-flex
-            items-center
-            gap-2
-            px-4
-            py-2
-            rounded-full
-            bg-cyan-400/10
-            border
-            border-cyan-400/20
-            text-cyan-400
-            mb-6
-          "
-        >
-          🎮 Decision Support System
-        </div>
-
+        
         <h1
           className="
             text-5xl
-            md:text-6xl
+            md:text-7xl
+
             font-bold
+
+            mt-8
             leading-tight
           "
         >
           Temukan Game Terbaik
           <br />
-          Dengan
+
+          Dengan Metode
+
           <span className="text-cyan-400">
             {" "}
             AHP & TOPSIS
@@ -157,35 +197,40 @@ export default function HomePage() {
 
         <p
           className="
-            mt-6
-            text-slate-400
+            mt-8
+
             text-lg
-            max-w-3xl
+            text-slate-400
+
+            max-w-4xl
             mx-auto
+
+            leading-8
           "
         >
-          Sistem rekomendasi game berbasis
-          metode AHP dan TOPSIS yang
-          membantu pengguna memilih game
-          terbaik berdasarkan harga,
-          rating, metacritic, popularitas,
-          jumlah review, dan tanggal rilis.
+          GameFinder merupakan Sistem Pendukung Keputusan
+          (SPK) yang membantu pengguna menemukan game
+          terbaik berdasarkan preferensi pribadi menggunakan
+          metode Analytical Hierarchy Process (AHP)
+          dan Technique for Order Preference by Similarity to
+          Ideal Solution (TOPSIS).
         </p>
 
         <div
           className="
-            mt-10
             flex
             justify-center
             gap-4
             flex-wrap
+
+            mt-10
           "
         >
           <button
             onClick={() =>
               router.push(
                 loggedIn
-                  ? "/dashboard"
+                  ? "/recommendation"
                   : "/register"
               )
             }
@@ -193,48 +238,139 @@ export default function HomePage() {
               flex
               items-center
               gap-2
+
               bg-cyan-400
               text-black
+
               px-6
               py-3
+
               rounded-xl
+
               font-semibold
             "
           >
-            Mulai Sekarang
+            Generate Recommendation
             <ArrowRight size={18} />
           </button>
 
           <button
             onClick={() =>
-              router.push("/explore")
+              router.push("/instruction")
             }
             className="
+              flex
+              items-center
+              gap-2
+
               border
               border-slate-700
+
               px-6
               py-3
+
               rounded-xl
             "
           >
-            Explore Games
+            <CircleHelp size={18} />
+            How It Works
           </button>
         </div>
       </section>
 
-      {/* FEATURES */}
+      {/* ========================= */}
+      {/* CRITERIA */}
+      {/* ========================= */}
       <section
         className="
-          max-w-6xl
+          max-w-7xl
           mx-auto
-          px-8
-          pb-24
+
+          px-6
+          md:px-10
+
+          pb-16
         "
       >
+        <h2
+          className="
+            text-3xl
+            font-bold
+            text-center
+            mb-10
+          "
+        >
+          Kriteria Evaluasi Game
+        </h2>
+
         <div
           className="
             grid
             md:grid-cols-3
+            lg:grid-cols-6
+            gap-4
+          "
+        >
+          {[
+            "Price",
+            "Metacritic",
+            "Popularity",
+            "User Rating",
+            "Review Count",
+            "Release Date",
+          ].map((item) => (
+            <div
+              key={item}
+              className="
+                bg-[#111C33]
+                border
+                border-slate-800
+
+                rounded-2xl
+
+                p-5
+
+                text-center
+              "
+            >
+              {item}
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ========================= */}
+      {/* FEATURES */}
+      {/* ========================= */}
+      <section
+        className="
+          max-w-7xl
+          mx-auto
+
+          px-6
+          md:px-10
+
+          pb-24
+        "
+      >
+        <h2
+          className="
+            text-3xl
+            font-bold
+            text-center
+
+            mb-10
+          "
+        >
+          Fitur Utama
+        </h2>
+
+        <div
+          className="
+            grid
+            md:grid-cols-2
+            lg:grid-cols-4
+
             gap-6
           "
         >
@@ -243,6 +379,7 @@ export default function HomePage() {
               bg-[#111C33]
               border
               border-slate-800
+
               rounded-2xl
               p-6
             "
@@ -257,9 +394,8 @@ export default function HomePage() {
             </h3>
 
             <p className="text-slate-400 mt-3">
-              Menentukan bobot setiap
-              kriteria berdasarkan
-              preferensi pengguna.
+              Menentukan bobot setiap kriteria
+              berdasarkan preferensi pengguna.
             </p>
           </div>
 
@@ -268,6 +404,7 @@ export default function HomePage() {
               bg-[#111C33]
               border
               border-slate-800
+
               rounded-2xl
               p-6
             "
@@ -282,9 +419,8 @@ export default function HomePage() {
             </h3>
 
             <p className="text-slate-400 mt-3">
-              Menghasilkan ranking game
-              terbaik berdasarkan solusi
-              ideal positif dan negatif.
+              Menghasilkan ranking alternatif
+              terbaik berdasarkan solusi ideal.
             </p>
           </div>
 
@@ -293,27 +429,163 @@ export default function HomePage() {
               bg-[#111C33]
               border
               border-slate-800
+
               rounded-2xl
               p-6
             "
           >
-            <Gamepad2
+            <Database
               className="text-cyan-400 mb-4"
               size={30}
             />
 
             <h3 className="font-bold text-xl">
-              Real-Time Game Data
+              RAWG Database
             </h3>
 
             <p className="text-slate-400 mt-3">
-              Data game berasal dari RAWG
-              dan CheapShark sehingga selalu
-              relevan.
+              Ribuan data game, genre,
+              platform, publisher, rating,
+              dan metacritic.
+            </p>
+          </div>
+
+          <div
+            className="
+              bg-[#111C33]
+              border
+              border-slate-800
+
+              rounded-2xl
+              p-6
+            "
+          >
+            <Sparkles
+              className="text-cyan-400 mb-4"
+              size={30}
+            />
+
+            <h3 className="font-bold text-xl">
+              CheapShark Deals
+            </h3>
+
+            <p className="text-slate-400 mt-3">
+              Menampilkan harga game,
+              diskon, dan store termurah
+              secara real-time.
             </p>
           </div>
         </div>
       </section>
+
+      {/* ========================= */}
+      {/* WORKFLOW */}
+      {/* ========================= */}
+      <section
+        className="
+          bg-[#111C33]
+          border-t
+          border-slate-800
+        "
+      >
+        <div
+          className="
+            max-w-6xl
+            mx-auto
+
+            px-6
+            md:px-10
+
+            py-20
+          "
+        >
+          <h2
+            className="
+              text-3xl
+              font-bold
+              text-center
+
+              mb-12
+            "
+          >
+            Cara Kerja Sistem
+          </h2>
+
+          <div
+            className="
+              grid
+              md:grid-cols-4
+              gap-6
+            "
+          >
+            {[
+              "Input Preferensi",
+              "Hitung Bobot AHP",
+              "Ranking TOPSIS",
+              "Rekomendasi Game",
+            ].map((step, index) => (
+              <div
+                key={step}
+                className="
+                  text-center
+                "
+              >
+                <div
+                  className="
+                    w-14
+                    h-14
+
+                    mx-auto
+                    mb-4
+
+                    rounded-full
+
+                    bg-cyan-400
+                    text-black
+
+                    flex
+                    items-center
+                    justify-center
+
+                    font-bold
+                    text-lg
+                  "
+                >
+                  {index + 1}
+                </div>
+
+                <h3 className="font-semibold">
+                  {step}
+                </h3>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ========================= */}
+      {/* FOOTER */}
+      {/* ========================= */}
+      <footer
+        className="
+          border-t
+          border-slate-800
+
+          py-8
+
+          text-center
+          text-slate-500
+        "
+      >
+        <p>
+          GameFinder © 2026
+        </p>
+
+        <p className="mt-2 text-sm">
+          Decision Support System Using
+          AHP & TOPSIS
+        </p>
+      </footer>
     </main>
   );
 }

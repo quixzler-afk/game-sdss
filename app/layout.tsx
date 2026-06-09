@@ -8,7 +8,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Game Recommendation System",
+  title: "GameFinder",
   description:
     "SPK Rekomendasi Game menggunakan metode AHP dan TOPSIS",
 };
