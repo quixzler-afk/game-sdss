@@ -228,11 +228,7 @@ export default function HomePage() {
         >
           <button
             onClick={() =>
-              router.push(
-                loggedIn
-                  ? "/recommendation"
-                  : "/register"
-              )
+              router.push("/recommendation")
             }
             className="
               flex
