@@ -2,13 +2,22 @@
 
 import { useEffect, useState } from "react";
 
-import DashboardLayout from "components/DashboardLayout";
+import DashboardLayout from "../../components/DashboardLayout";
 
-import { getUser } from "../../services/auth.service";
-
-import { getProfile } from "../../services/profile.service";
+import {
+  getUser,
+  getDisplayName,
+} from "../../services/auth.service";
 
 import { getDashboardStats } from "../../services/dashboard.service";
+
+import {
+  Heart,
+  History,
+  Gamepad2,
+  Trophy,
+  Sparkles,
+} from "lucide-react";
 
 interface Stats {
   wishlistCount: number;
@@ -20,7 +29,7 @@ export default function DashboardPage() {
     useState(true);
 
   const [username, setUsername] =
-    useState("");
+    useState("Player");
 
   const [email, setEmail] =
     useState("");
@@ -32,30 +41,30 @@ export default function DashboardPage() {
     });
 
   useEffect(() => {
-    loadData();
+    loadDashboard();
   }, []);
 
-  const loadData =
+  const loadDashboard =
     async () => {
       try {
         const user =
           await getUser();
 
-        if (!user) return;
+        const displayName =
+          await getDisplayName();
 
-        setEmail(user.email ?? "");
+        setUsername(
+          displayName || "Player"
+        );
 
-        const profile =
-          await getProfile(
-            user.id
-          );
-
-        if (profile.data) {
-          setUsername(
-            profile.data.username ??
-              ""
-          );
+        if (!user) {
+          setLoading(false);
+          return;
         }
+
+        setEmail(
+          user.email ?? ""
+        );
 
         const dashboardStats =
           await getDashboardStats(
@@ -74,117 +83,307 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="text-white p-8">
-        Loading...
-      </div>
+      <DashboardLayout>
+        <div className="p-8 text-white">
+          Loading...
+        </div>
+      </DashboardLayout>
     );
   }
 
   return (
     <DashboardLayout>
-      <div className="p-8">
+      <div className="p-8 text-white">
 
-        <h1
+        {/* HERO */}
+        <div
           className="
-            text-4xl
-            font-bold
-            text-white
+            relative
+            overflow-hidden
+            rounded-3xl
+            border
+            border-slate-800
+            bg-gradient-to-r
+            from-cyan-500/10
+            via-slate-900
+            to-blue-500/10
+            p-8
+            mb-8
           "
         >
-          Welcome,
-          {" "}
-          {username ||
-            "Player"}
-        </h1>
+          <div className="absolute top-0 right-0 opacity-10">
+            <Gamepad2 size={250} />
+          </div>
 
-        <p
-          className="
-            text-slate-400
-            mt-2
-          "
-        >
-          {email}
-        </p>
+          <div className="relative z-10">
+            <h1
+              className="
+                text-4xl
+                md:text-5xl
+                font-bold
+              "
+            >
+              Welcome,
+              <span className="text-cyan-400">
+                {" "}
+                {username}
+              </span>
+            </h1>
 
+            <p
+              className="
+                text-slate-400
+                mt-3
+                max-w-2xl
+              "
+            >
+              Temukan game terbaik menggunakan
+              metode AHP dan TOPSIS berdasarkan
+              preferensi yang kamu tentukan.
+            </p>
+
+            {email && (
+              <p
+                className="
+                  text-slate-500
+                  mt-2
+                "
+              >
+                {email}
+              </p>
+            )}
+          </div>
+        </div>
+
+        {/* STATS */}
         <div
           className="
             grid
             md:grid-cols-3
-            gap-5
+            gap-6
+          "
+        >
+          {/* Wishlist */}
+          <div
+            className="
+              bg-[#111C33]
+              border
+              border-slate-800
+              rounded-2xl
+              p-6
+
+              hover:border-cyan-400
+              transition
+            "
+          >
+            <div
+              className="
+                flex
+                justify-between
+                items-center
+              "
+            >
+              <div>
+                <p className="text-slate-400">
+                  Wishlist
+                </p>
+
+                <h2
+                  className="
+                    text-4xl
+                    font-bold
+                    text-cyan-400
+                    mt-2
+                  "
+                >
+                  {stats.wishlistCount}
+                </h2>
+              </div>
+
+              <Heart
+                size={40}
+                className="text-cyan-400"
+              />
+            </div>
+          </div>
+
+          {/* History */}
+          <div
+            className="
+              bg-[#111C33]
+              border
+              border-slate-800
+              rounded-2xl
+              p-6
+
+              hover:border-cyan-400
+              transition
+            "
+          >
+            <div
+              className="
+                flex
+                justify-between
+                items-center
+              "
+            >
+              <div>
+                <p className="text-slate-400">
+                  Recommendation History
+                </p>
+
+                <h2
+                  className="
+                    text-4xl
+                    font-bold
+                    text-cyan-400
+                    mt-2
+                  "
+                >
+                  {stats.historyCount}
+                </h2>
+              </div>
+
+              <History
+                size={40}
+                className="text-cyan-400"
+              />
+            </div>
+          </div>
+
+          {/* Status */}
+          <div
+            className="
+              bg-[#111C33]
+              border
+              border-slate-800
+              rounded-2xl
+              p-6
+
+              hover:border-green-400
+              transition
+            "
+          >
+            <div
+              className="
+                flex
+                justify-between
+                items-center
+              "
+            >
+              <div>
+                <p className="text-slate-400">
+                  Account Status
+                </p>
+
+                <h2
+                  className="
+                    text-4xl
+                    font-bold
+                    text-green-400
+                    mt-2
+                  "
+                >
+                  {email
+                    ? "Active"
+                    : "Visitor"}
+                </h2>
+              </div>
+
+              <Trophy
+                size={40}
+                className="text-green-400"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* INFO SECTION */}
+        <div
+          className="
             mt-8
+            grid
+            lg:grid-cols-2
+            gap-6
           "
         >
           <div
             className="
               bg-[#111C33]
+              border
+              border-slate-800
               rounded-2xl
               p-6
             "
           >
-            <p className="text-slate-400">
-              Wishlist
-            </p>
-
-            <h2
+            <h3
               className="
-                text-3xl
-                text-cyan-400
-                font-bold
+                text-xl
+                font-semibold
+                mb-3
               "
             >
-              {
-                stats.wishlistCount
-              }
-            </h2>
+              🎮 GameFinder
+            </h3>
+
+            <p className="text-slate-400">
+              Sistem rekomendasi game berbasis
+              AHP dan TOPSIS yang membantu
+              pengguna menemukan game terbaik
+              berdasarkan genre, platform,
+              rating, metacritic, review,
+              popularitas, harga, dan tanggal
+              rilis.
+            </p>
           </div>
 
           <div
             className="
               bg-[#111C33]
+              border
+              border-slate-800
               rounded-2xl
               p-6
             "
           >
-            <p className="text-slate-400">
-              Recommendation
-              History
-            </p>
-
-            <h2
+            <h3
               className="
-                text-3xl
-                text-cyan-400
-                font-bold
+                text-xl
+                font-semibold
+                mb-3
               "
             >
-              {
-                stats.historyCount
-              }
-            </h2>
-          </div>
+              🚀 Quick Tips
+            </h3>
 
-          <div
-            className="
-              bg-[#111C33]
-              rounded-2xl
-              p-6
-            "
-          >
-            <p className="text-slate-400">
-              Account Status
-            </p>
-
-            <h2
+            <ul
               className="
-                text-3xl
-                text-green-400
-                font-bold
+                space-y-2
+                text-slate-400
               "
             >
-              Active
-            </h2>
+              <li>
+                • Explore untuk mencari game.
+              </li>
+
+              <li>
+                • Recommendation untuk
+                menghasilkan ranking TOPSIS.
+              </li>
+
+              <li>
+                • Wishlist untuk menyimpan game
+                favorit.
+              </li>
+
+              <li>
+                • History untuk melihat hasil
+                rekomendasi sebelumnya.
+              </li>
+            </ul>
           </div>
         </div>
+
       </div>
     </DashboardLayout>
   );

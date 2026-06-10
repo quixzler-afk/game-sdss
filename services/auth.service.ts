@@ -12,12 +12,21 @@ export async function login(
 
 export async function register(
   email: string,
-  password: string
+  password: string,
+  username?: string
 ) {
-  return supabase.auth.signUp({
-    email,
-    password,
-  });
+  const result =
+    await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          username,
+        },
+      },
+    });
+
+  return result;
 }
 
 export async function logout() {
@@ -25,9 +34,46 @@ export async function logout() {
 }
 
 export async function getUser() {
+  try {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (!session) {
+      return null;
+    }
+
+    return session.user;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+}
+
+/**
+ * Ambil username terbaik
+ * Prioritas:
+ * 1. profile.username
+ * 2. auth metadata username
+ * 3. email sebelum @
+ */
+export async function getDisplayName() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  return user;
+  if (!user) return "Player";
+
+  const metadataUsername =
+    user.user_metadata?.username;
+
+  if (metadataUsername) {
+    return metadataUsername;
+  }
+
+  if (user.email) {
+    return user.email.split("@")[0];
+  }
+
+  return "Player";
 }

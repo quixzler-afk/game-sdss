@@ -68,7 +68,6 @@ export default function HomePage() {
             className="
               w-10
               h-10
-
               rounded-xl
 
               bg-cyan-400
@@ -78,20 +77,17 @@ export default function HomePage() {
               items-center
               justify-center
 
-              font-bold
+              shadow-lg
+              shadow-cyan-400/30
             "
           >
-            G
+            <Gamepad2 size={22} strokeWidth={2.5} />
           </div>
 
           <div>
-            <h1 className="font-bold text-xl">
+            <h1 className="font-bold text-lg text-white">
               GameFinder
             </h1>
-
-            <p className="text-xs text-slate-400">
-              AHP + TOPSIS DSS
-            </p>
           </div>
         </div>
 

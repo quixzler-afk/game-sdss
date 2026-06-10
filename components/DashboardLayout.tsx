@@ -4,7 +4,7 @@ import { ReactNode, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
-import { ChevronLeft, ChevronRight, LogOut } from "lucide-react";
+import { ChevronLeft, ChevronRight, LogOut, Gamepad2 } from "lucide-react";
 
 import { sidebarMenu } from "../constants/sidebar-menu";
 import { logout } from "../services/auth.service";
@@ -22,7 +22,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const handleLogout = async () => {
     try {
       await logout();
-      router.push("/login");
+      router.push("/");
     } catch (error) {
       console.error("Logout error:", error);
     }
@@ -68,8 +68,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               {/* LOGO */}
               <div
                 className="
-                  w-9
-                  h-9
+                  w-10
+                  h-10
                   rounded-xl
 
                   bg-cyan-400
@@ -79,17 +79,15 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                   items-center
                   justify-center
 
-                  font-bold
-                  text-lg
+                  shadow-lg
+                  shadow-cyan-400/30
                 "
               >
-                G
+                <Gamepad2 size={22} strokeWidth={2.5} />
               </div>
 
               <div>
                 <h1 className="font-bold text-lg text-white">GameFinder</h1>
-
-                <p className="text-[10px] text-slate-400">AHP + TOPSIS DSS</p>
               </div>
             </div>
           )}
